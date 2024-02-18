@@ -194,6 +194,8 @@ from GroupsLectures as GL
 join Groups1 as G on GL.GroupId = G.id
 join Lectures as L on GL.LectureId = L.id
 join Teachers as T on L.TeacherId = T.id
+group by Surname,Name,Group_of_students 
+order by Group_of_students 
 ;
 
     
@@ -216,18 +218,69 @@ from GroupsLectures as GL
 join Groups1 as G on GL.GroupId = G.id
 join Lectures as L on GL.LectureId = L.id
 join Teachers as T on L.TeacherId = T.id
--- group by Surname
+group by Surname,Name,Group_of_students 
 having Group_of_students = 'C123' 
 ;
 
 -- 5
-select T.Surname, T.Name, F.Name
+select T.Surname, T.Name, F.Name as Faculties
 from GroupsLectures as GL
 join Groups1 as G on GL.GroupId = G.id
 join Departments as D on DepartmentId = D.id
 join Faculties as F on FacultyId = F.id
 join Lectures as L on GL.LectureId = L.id
 join Teachers as T on L.TeacherId = T.id
--- group by Surname
+group by Surname,Name,Faculties
 ;
 
+-- 6
+select D.Name, G.Name
+from Groups1 as G
+join Departments as D on DepartmentId = D.id
+;
+
+-- 7
+select T.Surname,T.Name,S.Name as Subjects
+from Lectures as L
+join Teachers as T on L.TeacherId=T.id
+join Subjects as S on L.SubjectId=S.id
+having Surname='Filatov'
+;
+
+-- 8
+select D.Name as Department, S.Name as Subject
+from GroupsLectures as GL
+join Groups1 as G on GL.GroupId = G.id
+join Departments as D on DepartmentId = D.id
+join Lectures as L on GL.LectureId = L.id
+join Subjects as S on L.TeacherId = S.id
+group by Department,Subject
+having S.Name='History'
+;
+-- 9
+select G.Name as Grps, F.Name as Faculty
+from Groups1 as G
+join Departments as D on DepartmentId = D.id
+right join Faculties as F on FacultyId=F.id
+having Faculty = 'Humanities'
+-- having Faculty = 'Еxact sciences'
+;
+
+-- 10
+select G.Name as Grps, F.Name as Faculty
+from Groups1 as G
+join Departments as D on DepartmentId = D.id
+join Faculties as F on FacultyId=F.id
+where G.Year=5
+;
+
+-- 11
+select T.Surname,T.Name,S.Name as Subjects,G.Name as Grps
+from GroupsLectures as GL
+join Groups1 as G on GL.GroupId = G.id
+join Lectures as L on GL.LectureId = L.id
+join Teachers as T on L.TeacherId = T.id
+join Subjects as S on L.SubjectId=S.id
+where L.LectureRoom = '201'
+order by Grps
+;
