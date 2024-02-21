@@ -578,30 +578,49 @@ from GroupsStudents as GS
 join Groups1 as G on GS.GroupId = G.id
 join Students as S on GS.StudentId = S.id
 group by G.Name
+having avg(S.Rating)> 
+	(select avg(S.Rating)
+		from GroupsStudents as GS
+		join Groups1 as G on GS.GroupId = G.id
+		join Students as S on GS.StudentId = S.id
+		group by G.Name
+		having G.Name = 'P222')
 ;
-select Name, AVGrat from 
-(select G.Name, avg(S.Rating) as 'AVGrat'
-from GroupsStudents as GS
-join Groups1 as G on GS.GroupId = G.id
-join Students as S on GS.StudentId = S.id
-group by G.Name) as Bas 
+
+-- 2.4
+select concat(Name,' ',Surname) as Fullname, salary 
+from Teachers as T
+where salary>(
+	select avg(salary) 
+    from Teachers
+    );
+
+-- 2.5
+select G.Name, count(GS.CuratorId) as 'Quantity of curators'
+from GroupsCurators as GS 
+join Groups1 as G on GS.GroupId=G.id
+group by Name
+having count(GS.CuratorId)>1
 ;
+
 -- 2.6
-select G.Name, avg(S.Rating) from
+select G.Name, avg(S.Rating) as GrpRating from
 GroupsStudents as GS
 join Students as S on GS.StudentId = S.id
 join Groups1 as G on GS.GroupId = G.id
 group by Name
--- having avg(S.Rating)<3
-;
-select G.Name, avg(S.Rating) from
-GroupsStudents as GS
-join Students as S on GS.StudentId = S.id
-join Groups1 as G on GS.GroupId = G.id
-where G.Year = 5
-group by Name
-order by avg(S.Rating) asc limit 1
-;
+having GrpRating<(
+	select min(TabRating.GrpRating) 
+	from
+	(select G.Name, avg(S.Rating) as GrpRating 
+		from GroupsStudents as GS
+		join Students as S on GS.StudentId = S.id
+		join Groups1 as G on GS.GroupId = G.id
+		where G.Year = 5
+		group by Name) as TabRating
+	);
+    
+-- 2.7
 
 -- 2.8
 select S.Name as Subject, concat(Surname,' ', T.Name) as Fullname, count(L.SubjectId) as 'Quantity of Lectures'
